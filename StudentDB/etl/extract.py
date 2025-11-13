@@ -1,5 +1,5 @@
 from src.database import load_data
-from src.logger import log
+from Development.Python.StudentDB.src.utils.logger import log
 
 def extract():
     data = load_data()

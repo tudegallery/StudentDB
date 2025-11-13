@@ -1,32 +1,38 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from src.crud import add_student, view_students, delete_student, update_student
+from src.services.student_service import add_student, view_students, update_student, delete_student
 
 def main():
     while True:
-        print("\n=== MENU UTAMA ===")
-        print("1. Tambah Data Mahasiswa")
-        print("2. Tampilkan Data Mahasiswa")
-        print("3. Hapus Data Mahasiswa")
-        print("4. Update Data Mahasiswa")
-        print("5. Keluar Program")
+        print("\n=== STUDENT MANAGEMENT SYSTEM ===")
+        print("1. Add Student")
+        print("2. View Students")
+        print("3. Update Student")
+        print("4. Delete Student")
+        print("5. Exit")
 
-        choice = input("Pilih menu (1-5): ").strip()
+        choice = input("Select: ")
 
         if choice == "1":
-            add_student()
+            name = input("Name: ")
+            age = int(input("Age: "))
+            major = input("Major: ")
+            add_student(name, age, major)
         elif choice == "2":
-            view_students()
+            students = view_students()
+            for s in students:
+                print(s)
         elif choice == "3":
-            delete_student()
+            name = input("Name to update: ")
+            age = input("New age (or skip): ")
+            major = input("New major (or skip): ")
+            update_student(name, int(age) if age else None, major if major else None)
         elif choice == "4":
-            update_student()
+            name = input("Name to delete: ")
+            delete_student(name)
         elif choice == "5":
-            print("Keluar program.")
+            print("Bye!")
             break
         else:
-            print("Pilihan tidak valid!")
+            print("Invalid choice.")
 
 if __name__ == "__main__":
     main()

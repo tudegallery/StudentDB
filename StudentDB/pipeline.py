@@ -1,7 +1,7 @@
 from etl.extract import extract
 from etl.transform import transform
 from etl.load import load
-from src.logger import log
+from Development.Python.StudentDB.src.utils.logger import log
 
 def run_pipeline():
     log("ETL Pipeline started.")

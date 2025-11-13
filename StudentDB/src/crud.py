@@ -1,6 +1,6 @@
 from src.database import load_data, save_data
 from src.validation import validate_student
-from src.logger import log
+from Development.Python.StudentDB.src.utils.logger import log
 
 def add_student():
     students = load_data()
