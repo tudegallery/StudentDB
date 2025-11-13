@@ -1,4 +1,0 @@
-paths:
-  raw_data: "data/raw/students_raw.json"
-  processed_data: "data/processed/students_processed.json"
-  log_file: "logs/app.log"
