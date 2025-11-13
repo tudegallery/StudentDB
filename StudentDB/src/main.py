@@ -2,7 +2,6 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from src.crud import add_student, view_students, delete_student, update_student
-from src.database import load_data, save_data
 
 def main():
     while True:
@@ -29,7 +28,5 @@ def main():
         else:
             print("Pilihan tidak valid!")
 
-
 if __name__ == "__main__":
     main()
-

@@ -1,110 +1,49 @@
-import json
-import logging
-import os
-from datetime import datetime
 from src.database import load_data, save_data
-
-os.makedirs("logs", exist_ok=True)
-logging.basicConfig(
-    filename="logs/app.log",
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-def generate_id(data):
-    """Buat ID unik berdasarkan data terakhir."""
-    if not data:
-        return 1
-    return max([s["id"] for s in data]) + 1
+from src.validation import validate_student
+from src.logger import log
 
 def add_student():
-    """Tambah data mahasiswa baru."""
-    data = load_data() or []
+    students = load_data()
+    name = input("Masukkan nama mahasiswa: ").strip()
+    age = int(input("Masukkan umur: "))
+    major = input("Masukkan jurusan: ").strip()
 
-    print("\n=== Tambah Data Mahasiswa ===")
-    try:
-        name = input("Nama: ").strip()
-        age = int(input("Umur: "))
-        major = input("Jurusan: ").strip()
-
-        new_student = {
-            "id": generate_id(data),
-            "name": name,
-            "age": age,
-            "major": major,
-            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-
-        data.append(new_student)
-        save_data(data)
-        logging.info(f"ADD STUDENT: {name}")
-        print(f"Mahasiswa '{name}' berhasil ditambahkan!")
-    except ValueError:
-        print("Umur harus berupa angka!")
-
+    student = {"name": name, "age": age, "major": major}
+    validate_student(student)
+    students.append(student)
+    save_data(students)
+    log(f"ADD STUDENT: {name}")
 
 def view_students():
-    """Tampilkan seluruh data mahasiswa."""
-    data = load_data() or []
-
-    print("\n=== Daftar Mahasiswa ===")
-    if not data:
-        print("Belum ada data.")
+    students = load_data()
+    if not students:
+        print("Belum ada data mahasiswa.")
         return
-
-    for s in data:
-        print(f"[{s['id']}] {s['name']} - {s['major']} ({s['age']} tahun)")
-
+    for i, s in enumerate(students, start=1):
+        print(f"{i}. {s['name']} - {s['age']} tahun - {s['major']}")
 
 def delete_student():
-    """Hapus data mahasiswa berdasarkan ID."""
-    data = load_data() or []
-    if not data:
-        print("Tidak ada data untuk dihapus.")
+    students = load_data()
+    name = input("Masukkan nama mahasiswa yang ingin dihapus: ").strip()
+    updated = [s for s in students if s["name"].lower() != name.lower()]
+    if len(updated) == len(students):
+        print("Mahasiswa tidak ditemukan.")
         return
-
-    try:
-        sid = int(input("Masukkan ID mahasiswa yang ingin dihapus: "))
-        found = next((s for s in data if s["id"] == sid), None)
-
-        if found:
-            data.remove(found)
-            save_data(data)
-            logging.info(f"DELETE STUDENT: {found['name']}")
-            print(f"Mahasiswa '{found['name']}' berhasil dihapus!")
-        else:
-            print("ID tidak ditemukan.")
-    except ValueError:
-        print("Masukkan ID berupa angka.")
-
+    save_data(updated)
+    log(f"DELETE STUDENT: {name}")
 
 def update_student():
-    """Update data mahasiswa (umur/jurusan)."""
-    data = load_data() or []
-    if not data:
-        print("Tidak ada data untuk diperbarui.")
-        return
-
-    try:
-        sid = int(input("Masukkan ID mahasiswa yang ingin diubah: "))
-        found = next((s for s in data if s["id"] == sid), None)
-
-        if not found:
-            print("ID tidak ditemukan.")
-            return
-
-        print(f"\nEdit data untuk: {found['name']}")
-        new_age = input(f"Umur baru ({found['age']}): ").strip()
-        new_major = input(f"Jurusan baru ({found['major']}): ").strip()
-
-        if new_age:
-            found["age"] = int(new_age)
-        if new_major:
-            found["major"] = new_major
-
-        save_data(data)
-        logging.info(f"UPDATE STUDENT: {found['name']}")
-        print(f"Data '{found['name']}' berhasil diperbarui!")
-
-    except ValueError:
-        print("Input tidak valid! Pastikan umur berupa angka.")
+    students = load_data()
+    name = input("Masukkan nama mahasiswa yang ingin diupdate: ").strip()
+    found = False
+    for s in students:
+        if s["name"].lower() == name.lower():
+            s["age"] = int(input("Masukkan umur baru: "))
+            s["major"] = input("Masukkan jurusan baru: ").strip()
+            found = True
+            log(f"UPDATE STUDENT: {name}")
+    if not found:
+        print("Mahasiswa tidak ditemukan.")
+    else:
+        save_data(students)
+        print(f"Data {name} berhasil diupdate.")

@@ -1,21 +1,18 @@
-import json, os
+import json
+import os
+import yaml
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_DIR = os.path.join(BASE_DIR, "..", "data")
-os.makedirs(DB_DIR, exist_ok=True)
+with open("config/config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
-DB_FILE = os.path.join(DB_DIR, "students.json")
+RAW_DATA_PATH = config["paths"]["raw_data"]
 
 def load_data():
-    if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                print("File rusak, membuat ulang.")
-                return []
-    return []
+    if not os.path.exists(RAW_DATA_PATH) or os.path.getsize(RAW_DATA_PATH) == 0:
+        return []
+    with open(RAW_DATA_PATH, "r") as f:
+        return json.load(f)
 
 def save_data(data):
-    with open(DB_FILE, "w") as f:
+    with open(RAW_DATA_PATH, "w") as f:
         json.dump(data, f, indent=4)
